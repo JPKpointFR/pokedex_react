@@ -1,24 +1,25 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Pokemon from '../models/pokemon';
-import POKEMONS from '../models/mock-pokemon';
 import formatDate from '../helpers/format-date';
 import formatType from '../helpers/format-type';
+import PokemonService from '../services/pokemon-service';
+import Loader from '../components/loader';
 
 type Params = { id: string };
 
 const PokemonsDetail: FunctionComponent = () => {
 
+
     const { id } = useParams<Params>();
+    const pokemonId = id ? parseInt(id) : undefined;
     const [pokemon, setPokemon] = useState<Pokemon | null>(null);
 
     useEffect(() => {
-        POKEMONS.forEach(pokemon => {
-            if (id === pokemon.id.toString()) {
-                setPokemon(pokemon);
-            }
-        })
-    }, [id]);
+        if (pokemonId !== undefined) {
+            PokemonService.getPokemon(pokemonId).then(pokemon => setPokemon(pokemon));
+        }
+    }, [pokemonId]);
 
     return (
         <div>
@@ -58,7 +59,7 @@ const PokemonsDetail: FunctionComponent = () => {
                                             </tr>
                                             <tr>
                                                 <td>Date de création</td>
-                                                <td>{formatDate(pokemon.created)}</td>
+                                                <td>{formatDate()}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -71,18 +72,9 @@ const PokemonsDetail: FunctionComponent = () => {
                     </div>
                 </div>
             ) : (
-                <h4 className="center">Aucun pokémon à afficher !</h4>
+                <h4 className="center"><Loader /></h4>
             )}
         </div>
     );
 }
-
 export default PokemonsDetail;
-
-
-
-
-
-
-
-
